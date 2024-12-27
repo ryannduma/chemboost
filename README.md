@@ -1,4 +1,4 @@
-# Chemboost: SMACT-Based Intermetallics Classification using XGBoost
+# ChemBoost: SMACT-Based Intermetallics Classification using XGBoost
 
 This project uses SMACT and XGBoost to classify intermetallic compounds as metals or non-metals based on their composition and properties. Its an attempt to develop a filter capable of dealing with covalent chemical environments that could in the future be essential in the enhancement of the SMACT filter.
 
