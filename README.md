@@ -1,85 +1,88 @@
-# ChemBoost: SMACT-Based Intermetallics Classification using XGBoost
+# Intermetallics Module Documentation
 
-This project uses SMACT and XGBoost to classify intermetallic compounds as metals or non-metals based on their composition and properties. Its an attempt to develop a filter capable of dealing with covalent chemical environments that could in the future be essential in the enhancement of the SMACT filter.
+## Overview
 
-## Features
+The intermetallics module provides utility functions for analyzing and classifying intermetallic compounds using SMACT (Semiconducting Materials from Analogy and Chemical Theory). The module includes tools for composition analysis, metal content evaluation, and intermetallic property scoring.
 
-- Loads and processes materials data from Matbench
-- Calculates various compositional features including:
-  - Valence Electron Count (VEC)
-  - Electronegativity differences
-  - Atomic concentrations
-- Trains XGBoost classifier with hyperparameter optimization
-- Provides visualization tools for model interpretation
+## Code Structure (`intermetallics.py`)
 
-## Setup
+### Core Functions
 
-1. Create a conda environment:
+1. **Composition Handling**
 
-```bash
-conda create -n chemboost python=3.11
-conda activate chemboost
+   - `_ensure_composition(composition)`: Internal utility to convert string formulas to pymatgen Composition objects
+   - Handles both string and Composition inputs with proper error handling
+
+2. **Element Analysis Functions**
+
+   - `get_element_fraction(composition, element_set)`: Calculate fraction of elements from a given set
+   - `get_metal_fraction(composition)`: Calculate fraction of metallic elements
+   - `get_d_electron_fraction(composition)`: Calculate fraction of d-block elements
+   - `get_distinct_metal_count(composition)`: Count unique metallic elements
+
+3. **Chemical Property Analysis**
+
+   - `get_pauling_test_mismatch(composition)`: Calculate electronegativity ordering deviation
+   - Helps distinguish between ionic and metal-metal bonds
+
+4. **Scoring System**
+   - `intermetallic_score(composition)`: Calculate comprehensive intermetallic character (0-1)
+   - Considers multiple factors:
+     - Metal fraction (30% weight)
+     - d-electron content (20% weight)
+     - Number of metals (20% weight)
+     - Valence electron count (15% weight)
+     - Pauling electronegativity mismatch (15% weight)
+
+## Workflow Example (Intermetallics Classification Notebook)
+
+### Setup and Data Loading
+
+```python
+from matminer.datasets import load_dataset
+import smact.intermetallics as im
 ```
 
-2. Install the required packages:
+### Feature Extraction Pipeline
 
-```bash
-pip install -r requirements.txt
+1. Load composition data
+2. Extract intermetallic features:
+   - Metal fraction
+   - d-electron fraction
+   - Distinct metal count
+   - Pauling mismatch
+   - Intermetallic score
+
+### Machine Learning Application
+
+- Uses XGBoost classifier for metal vs. non-metal classification
+- Features cross-validation and threshold tuning
+- Includes hyperparameter optimization
+- Provides performance evaluation metrics
+
+### Key Components
+
+1. Data preprocessing
+2. Feature extraction using intermetallics module
+3. Model training with cross-validation
+4. Threshold optimization
+5. Performance evaluation
+
+## Usage Example
+
+```python
+from smact.intermetallics import intermetallic_score
+from pymatgen.core import Composition
+
+# Analyze a compound
+composition = "Fe2Al"
+score = intermetallic_score(composition)
+metal_fraction = get_metal_fraction(composition)
 ```
-
-## Project Structure
-
-- `data/`: Contains the dataset files
-- `notebooks/`: Jupyter notebooks for exploration and analysis
-- `src/`: Source code
-  - `data/`: Data loading utilities
-  - `features/`: Feature engineering code
-  - `models/`: Model training and evaluation
-  - `visualization/`: Plotting utilities
-
-## Usage
-
-See `notebooks/XGB_Final_Classification.ipynb` for the main analysis pipeline.
 
 ## Dependencies
 
-The main dependencies are:
-
-- numpy >= 2.0.0
-- pandas >= 2.0.0
-- xgboost == 2.1.3
-- scikit-learn == 1.5.2 **
-- matminer >= 0.9.0
-- pymatgen >= 2024.2.20
-- smact >= 2.8
-- shap >= 0.44.0
-
-See `requirements.txt` for a complete list.
-
-## Development
-
-To contribute to the project:
-
-1. Fork the repository
-2. Create a new branch for your feature
-3. Make your changes
-4. Submit a pull request
-
-## Troubleshooting
-
-Common issues:
-
-1. Import errors:
-   - Ensure you're running from the project root directory
-   - Verify the package is installed in development mode
-   - Check that your conda environment is activated
-
-2. Data loading errors:
-   - Verify that `magpiery.csv` is present in the `data/` directory
-
-3. Package Installation Errors
-    - ** Scikit-learn version 1.6 modified the API around its "tags", and that's the cause of this error. XGBoost has made the necessary changes in PR11021, but at present that hasn't made it into a released version. You can either keep your sklearn version <1.6, or build XGBoost directly from github (or upgrade XGBoost, after a new version is released)
-
-## License
-
-MIT
+- pymatgen
+- numpy
+- smact
+- (For classification notebook: scikit-learn, xgboost, pandas)
